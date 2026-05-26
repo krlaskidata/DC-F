@@ -23,7 +23,7 @@ from fishgame import FishCog
 from xpsystem import XPCog
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="?", intents=intents)
 
 HIGHLIGHTS_REACTION_THRESHOLD = 2
 
