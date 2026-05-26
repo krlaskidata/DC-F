@@ -1,7 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands
-from discord.ui import Button, View
+from discord.ui import View
 from collections import defaultdict
 
 FISH_SPAWN_THRESHOLD = 200
@@ -14,7 +14,7 @@ class FishButton(View):
         self.already_caught = False
 
     @discord.ui.button(label="Catch", style=discord.ButtonStyle.green)
-    async def catch_fish(self, interaction: discord.Interaction, button: Button):
+    async def catch_fish(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.already_caught:
             await interaction.response.send_message("Someone already caught the fish!", ephemeral=True)
             return
@@ -39,7 +39,7 @@ class FishCog(commands.Cog):
         if message.author.bot:
             return
         self.message_count += 1
-        if self.message_count >= FISH_SPAWN_THRESHOLD:
+        if self.message_count >= FISH_SPAWN_THRESHOLD and not self.fish_spawned:
             self.message_count = 0
             await self.try_spawn_fish(message.channel)
 
@@ -47,8 +47,6 @@ class FishCog(commands.Cog):
         if self.fish_spawned:
             return
         async with self.fish_spawn_lock:
-            if self.fish_spawned:
-                return
             self.fish_spawned = True
             fish_view = FishButton(self.fish_leaderboard)
             await channel.send("A wild fish has appeared! Be the first to catch it!", view=fish_view)
