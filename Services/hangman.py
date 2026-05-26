@@ -29,7 +29,7 @@ class HangmanGame:
         self.remaining_tries = 6
 
     def display_word(self):
-        return " ".join([letter if letter in self.guessed_letters else "_" for letter in self.word])
+        return " ".join(letter if letter in self.guessed_letters else "_" for letter in self.word)
 
     def guess_letter(self, letter):
         letter = letter.lower()
@@ -64,7 +64,7 @@ class HangmanCog(commands.Cog):
             )
             return
 
-        chosen_word = random.choice(hangman_word_pool).lower()
+        chosen_word = random.choice(hangman_word_pool)
         game = HangmanGame(chosen_word)
         self.active_games[interaction.channel.id] = game
 
@@ -99,26 +99,24 @@ class HangmanCog(commands.Cog):
             return
 
         game = self.active_games[interaction.channel.id]
-        correct, result_message = game.guess_letter(letter)
-
-        embed = discord.Embed(title="Hangman", color=discord.Color.orange())
-        embed.description = (
-            f"{game.get_stage_art()}\n"
-            f"{result_message}\n\n"
-            f"Word: `{game.display_word()}`\n"
-            f"Tries remaining: {game.remaining_tries}"
-        )
+        _, result_message = game.guess_letter(letter)
 
         if game.is_won():
-            embed.title = "You Won!"
-            embed.color = discord.Color.green()
+            embed = discord.Embed(title="You Won!", color=discord.Color.green())
             embed.description = f"Word: `{game.word}`\nYou guessed it correctly!"
             del self.active_games[interaction.channel.id]
         elif game.is_lost():
-            embed.title = "Game Over"
-            embed.color = discord.Color.red()
+            embed = discord.Embed(title="Game Over", color=discord.Color.red())
             embed.description = f"{game.get_stage_art()}\nOut of tries. The word was: `{game.word}`"
             del self.active_games[interaction.channel.id]
+        else:
+            embed = discord.Embed(title="Hangman", color=discord.Color.orange())
+            embed.description = (
+                f"{game.get_stage_art()}\n"
+                f"{result_message}\n\n"
+                f"Word: `{game.display_word()}`\n"
+                f"Tries remaining: {game.remaining_tries}"
+            )
 
         await interaction.response.send_message(embed=embed)
 
