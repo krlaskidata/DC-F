@@ -1,7 +1,6 @@
 import discord
 import json
 from discord.ext import commands
-from discord import app_commands
 from pathlib import Path
 from datetime import datetime
 
@@ -147,9 +146,9 @@ class XPCog(commands.Cog):
 
         self._save_data()
 
-    @app_commands.command(name="xp", description="Check your XP and level progress")
-    async def check_xp(self, interaction: discord.Interaction):
-        user_data = self._get_user_data(interaction.user.id)
+    @commands.command(name="xp")
+    async def check_xp(self, ctx: commands.Context):
+        user_data = self._get_user_data(ctx.author.id)
         tier = self._get_level_tier(user_data.level)
 
         embed = discord.Embed(
@@ -172,11 +171,11 @@ class XPCog(commands.Cog):
         if voice_role:
             embed.add_field(name="Voice Tier", value=voice_role, inline=True)
 
-        embed.set_thumbnail(url=interaction.user.display_avatar.url)
-        await interaction.response.send_message(embed=embed)
+        embed.set_thumbnail(url=ctx.author.display_avatar.url)
+        await ctx.send(embed=embed)
 
-    @app_commands.command(name="xpleaderboard", description="View top XP earners")
-    async def xp_leaderboard(self, interaction: discord.Interaction):
+    @commands.command(name="xpleaderboard")
+    async def xp_leaderboard(self, ctx: commands.Context):
         sorted_users = sorted(
             self.user_data.items(),
             key=lambda x: x[1].total_xp,
